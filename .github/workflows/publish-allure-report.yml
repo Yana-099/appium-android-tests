@@ -1,0 +1,59 @@
+name: Publish Allure report
+
+on:
+  workflow_run:
+    workflows: ["Android UI tests (self-hosted)"]
+    types: [completed]
+
+permissions:
+  actions: read
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: Build and publish Allure report
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Скачать Allure-результаты успешного запуска
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-and-artifacts-${{ github.event.workflow_run.run_number }}
+          path: downloaded-artifact
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Установить Allure CLI
+        env:
+          ALLURE_VERSION: 2.46.1
+        run: |
+          curl -fsSL -o allure.tgz "https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz"
+          tar -xzf allure.tgz
+
+      - name: Собрать HTML-отчёт Allure
+        env:
+          ALLURE_VERSION: 2.46.1
+        run: |
+          ./allure-${ALLURE_VERSION}/bin/allure generate downloaded-artifact/allure-results --clean --output allure-report
+
+      - name: Подготовить GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Загрузить отчёт для GitHub Pages
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: allure-report
+
+      - name: Опубликовать отчёт
+        id: deployment
+        uses: actions/deploy-pages@v4
