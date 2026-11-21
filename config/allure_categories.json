@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Проблемы инфраструктуры: ADB и эмулятор",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*(AndroidDeviceCommandError|ADB|adb|эмулятор).*"
+  },
+  {
+    "name": "Проблемы локаторов и ожиданий",
+    "matchedStatuses": ["broken"],
+    "messageRegex": ".*(NoSuchElementException|TimeoutException|StaleElementReferenceException).*"
+  },
+  {
+    "name": "Дефекты продукта",
+    "matchedStatuses": ["failed"]
+  }
+]
