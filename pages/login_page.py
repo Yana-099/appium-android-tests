@@ -50,15 +50,16 @@ class LoginPage(BasePage):
         return self.clickable(self.LOGIN_BUTTON).text
 
     @property
-    def are_controls_enabled(self) -> bool:
-        return all(
-            element.is_enabled()
-            for element in (
-                self.visible(self.USERNAME_FIELD),
-                self.visible(self.PASSWORD_FIELD),
-                self.clickable(self.LOGIN_BUTTON),
-            )
-        )
+    def is_username_field_enabled(self) -> bool:
+        return self.visible(self.USERNAME_FIELD).is_enabled()
+
+    @property
+    def is_password_field_enabled(self) -> bool:
+        return self.visible(self.PASSWORD_FIELD).is_enabled()
+
+    @property
+    def is_login_button_enabled(self) -> bool:
+        return self.clickable(self.LOGIN_BUTTON).is_enabled()
 
     def enter_credentials(self, username: str, password: str):
         self.enter_username(username)

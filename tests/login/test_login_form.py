@@ -13,17 +13,34 @@ from pages.login_page import LOGIN_HELP_TEXT, LoginPage
 @allure.title("Форма login содержит обязательные элементы")
 def test_login_form_displays_required_controls(driver):
     # Открываем форму авторизации через боковое меню.
-    with allure.step("Открыть форму login"):
+    with allure.step("Открыть боковое меню и перейти на форму Login"):
         login_page = LoginPage(driver).open()
 
-    # Проверяем заголовок, подсказку и подписи полей формы.
-    with allure.step("Проверить тексты и подписи формы"):
+    # Проверяем заголовок формы.
+    with allure.step("Проверить заголовок формы: Login"):
         assert login_page.title == "Login"
+
+    # Проверяем текст подсказки для тестовых учётных данных.
+    with allure.step("Проверить подсказку по выбору учётных данных"):
         assert login_page.help_text == LOGIN_HELP_TEXT
+
+    # Проверяем подпись поля имени пользователя.
+    with allure.step("Проверить подпись поля Username"):
         assert login_page.username_label == "Username"
+
+    # Проверяем подпись поля пароля.
+    with allure.step("Проверить подпись поля Password"):
         assert login_page.password_label == "Password"
 
-    # Убеждаемся, что элементы формы доступны для взаимодействия.
-    with allure.step("Проверить доступность элементов формы"):
-        assert login_page.are_controls_enabled
+    # Проверяем доступность поля имени пользователя.
+    with allure.step("Проверить доступность поля Username"):
+        assert login_page.is_username_field_enabled
+
+    # Проверяем доступность поля пароля.
+    with allure.step("Проверить доступность поля Password"):
+        assert login_page.is_password_field_enabled
+
+    # Проверяем доступность кнопки входа.
+    with allure.step("Проверить доступность кнопки Login"):
         assert login_page.login_button_text == "Login"
+        assert login_page.is_login_button_enabled
