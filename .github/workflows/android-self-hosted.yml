@@ -1,0 +1,65 @@
+name: Android UI tests (self-hosted)
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_scope:
+        description: "Группа тестов для запуска"
+        required: true
+        default: "smoke"
+        type: choice
+        options:
+          - smoke
+          - regression
+          - negative
+          - known_bug
+
+concurrency:
+  group: android-emulator-5554
+  cancel-in-progress: false
+
+jobs:
+  run-ui-tests:
+    name: Run ${{ inputs.test_scope }} tests
+    runs-on: [self-hosted, windows, appium]
+    timeout-minutes: 30
+
+    defaults:
+      run:
+        shell: powershell
+
+    steps:
+      - name: Получить код проекта
+        uses: actions/checkout@v6
+
+      - name: Настроить Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Установить зависимости
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Проверить Appium и Android-эмулятор
+        run: |
+          Invoke-RestMethod -Uri "http://127.0.0.1:4723/status" | Out-Null
+          $device = & adb devices | Select-String -Pattern "^emulator-5554\s+device$"
+          if (-not $device) {
+            throw "Устройство emulator-5554 не найдено через ADB."
+          }
+
+      - name: Запустить выбранную группу тестов
+        run: python -m pytest -m "${{ inputs.test_scope }}" -v
+
+      - name: Сохранить Allure-результаты и артефакты
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-and-artifacts-${{ github.run_number }}
+          path: |
+            allure-results/
+            artifacts/
+          if-no-files-found: warn
+          retention-days: 14
