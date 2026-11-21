@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # Проверяем обновления Python-зависимостей из requirements.txt.
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    labels:
+      - dependencies
+      - python
+
+  # Проверяем обновления GitHub Actions из workflow-файлов.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    labels:
+      - dependencies
+      - github-actions

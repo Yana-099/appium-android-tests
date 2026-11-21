@@ -1,5 +1,12 @@
 # Appium Android UI Tests
 
+[![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![pytest](https://img.shields.io/badge/pytest-9.2.0-0A9EDC?logo=pytest&logoColor=white)](https://pytest.org/)
+[![Appium](https://img.shields.io/badge/Appium-6.1.7-EE376D?logo=appium&logoColor=white)](https://appium.io/)
+[![Android](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)](https://www.android.com/)
+[![Smoke tests](https://github.com/Yana-099/appium-android-tests/actions/workflows/android-self-hosted.yml/badge.svg?branch=main)](https://github.com/Yana-099/appium-android-tests/actions/workflows/android-self-hosted.yml)
+[![Allure Report](https://img.shields.io/badge/Allure_Report-GitHub_Pages-7B68EE?logo=allure&logoColor=white)](https://yana-099.github.io/appium-android-tests/)
+
 Portfolio project with automated UI tests for the [Sauce Labs My Demo App](https://github.com/saucelabs/my-demo-app-android) Android application.
 
 The project demonstrates a maintainable mobile test automation framework built with Python, pytest, Appium, Page Object Model, and Allure reporting.
