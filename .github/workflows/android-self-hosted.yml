@@ -32,10 +32,10 @@ jobs:
       - name: Получить код проекта
         uses: actions/checkout@v6
 
-      - name: Настроить Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.13"
+      - name: Проверить локальный Python
+        run: |
+          python --version
+          python -m pip --version
 
       - name: Установить зависимости
         run: |
