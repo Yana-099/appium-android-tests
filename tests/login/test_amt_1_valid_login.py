@@ -1,5 +1,6 @@
 import allure
 import pytest
+from qase.pytest import qase
 
 from config.test_data import STANDARD_PASSWORD, STANDARD_USERNAME
 from pages.login_page import LoginPage
@@ -7,41 +8,44 @@ from pages.menu_page import MenuPage
 from pages.products_page import ProductsPage
 
 
+@qase.id(1)
+@pytest.mark.smoke
 @pytest.mark.regression
-@allure.tag("regression")
+@allure.tag("smoke", "regression")
 @allure.severity(allure.severity_level.CRITICAL)
 @allure.epic("Mobile Demo App")
 @allure.feature("Авторизация")
 @allure.story("Успешный вход")
-@allure.title("Стандартный пользователь может авторизоваться")
-def test_standard_user_can_authorize(driver):
-    # Открываем приложение и проверяем стартовый экран каталога.
+@allure.title("AMT-1: вход с валидными данными")
+def test_valid_user_can_log_in(driver):
     with allure.step("Открыть приложение"):
         assert ProductsPage(driver).wait_until_loaded().is_open
 
-    # Открываем боковое меню и проверяем доступность пункта Login.
     with allure.step("Открыть боковое меню"):
         menu_page = MenuPage(driver).open()
         assert menu_page.is_open
 
-    # Переходим к форме Login для ввода учётных данных.
-    with allure.step("Открыть форму Login"):
+    with allure.step("Выбрать пункт Login"):
         menu_page.open_login()
         login_page = LoginPage(driver)
+        assert login_page.title == "Login"
+        assert login_page.is_username_field_enabled
+        assert login_page.is_password_field_enabled
+        assert login_page.login_button_text == "Login"
 
-    # Вводим корректное значение в поле Username и проверяем его сохранение.
-    with allure.step("Ввести корректный логин"):
+    with allure.step("Ввести Username"):
         login_page.enter_username(STANDARD_USERNAME)
         assert login_page.entered_username == STANDARD_USERNAME
 
-    # Вводим пароль и проверяем, что поле содержит маскированное значение.
-    with allure.step("Ввести корректный пароль"):
+    with allure.step("Ввести Password"):
         login_page.enter_password(STANDARD_PASSWORD)
         assert login_page.entered_password
         assert login_page.entered_password != STANDARD_PASSWORD
 
-    # Подтверждаем авторизацию и проверяем переход в каталог с пунктом Logout.
     with allure.step("Нажать кнопку Login"):
         login_page.submit_login()
         assert ProductsPage(driver).wait_until_loaded().is_open
+        assert not login_page.error_message
+
+    with allure.step("Проверить наличие пункта Logout"):
         assert MenuPage(driver).open().has_logout_item
