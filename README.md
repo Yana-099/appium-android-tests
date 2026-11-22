@@ -16,8 +16,9 @@ The project demonstrates a maintainable mobile test automation framework built w
 - Page Object Model structure with reusable page classes.
 - One test scenario per file, grouped by business area.
 - Allure steps, labels, screenshots, page source, and Android logcat attachments on failure.
+- Pillow-based visual regression test with baseline, actual, diff, and comparison metrics in Allure.
 - Centralized test data in `config/test_data.py`.
-- pytest markers: `smoke`, `regression`, `negative`, `known_bug`, and `crash_demo`.
+- pytest markers: `smoke`, `regression`, `negative`, `known_bug`, `visual`, and `crash_demo`.
 - A deliberately failing crash demonstration is isolated and runs only with `--run-crash-demo`.
 
 ## Tech stack
@@ -28,6 +29,7 @@ The project demonstrates a maintainable mobile test automation framework built w
 - UiAutomator2
 - Android Emulator
 - Allure Report
+- Pillow
 
 ## Project structure
 
@@ -88,6 +90,7 @@ pytest -m smoke -v
 pytest -m regression -v
 pytest -m negative -v
 pytest -m known_bug -v
+pytest -m visual -v
 ```
 
 The crash diagnostic demonstration is intentionally failing and skipped by default. Run it explicitly only when needed:
@@ -95,6 +98,34 @@ The crash diagnostic demonstration is intentionally failing and skipped by defau
 ```bash
 pytest tests/lifecycle/test_crash_demo.py --run-crash-demo -v
 ```
+
+## Visual regression test
+
+The product card visual test complements functional assertions by checking the rendered layout of the product image, title, price, rating, color selector, quantity controls, and Add to cart button. The captured region excludes Android system bars and the transient right-edge scrollbar.
+
+Run the visual test separately:
+
+```bash
+pytest -m visual -v
+```
+
+The committed baseline supports one fixed environment profile:
+
+- device: `emulator-5554`
+- resolution: `1080x2400`
+- orientation: portrait
+- baseline: `tests/visual/baselines/android-emulator-5554/product_card.png`
+
+Pillow compares the baseline and actual RGB images without resizing them. A pixel is treated as changed when at least one color channel differs by more than `8`; the test fails when changed pixels occupy more than `0.1%` of the captured region. These thresholds were calibrated on repeated runs of the fixed emulator profile and should be recalibrated before adding another device or Android configuration.
+
+Every comparison adds the following attachments to Allure:
+
+- `Визуальный эталон` — committed baseline image;
+- `Фактический результат` — screenshot captured during the current run;
+- `Визуальная разница` — grayscale actual image with changed pixels highlighted in red;
+- `Метрики визуального сравнения` — JSON with changed-pixel counts, ratio, thresholds, and pass status.
+
+If image dimensions differ, the test does not resize them. Allure receives both input images, a side-by-side diagnostic image, and structured error details. Baselines are never updated automatically during a normal test run.
 
 ## Allure reports
 
