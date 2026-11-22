@@ -84,27 +84,14 @@ jobs:
           if ($passedMatch.Success) { $passed = $passedMatch.Groups[1].Value }
           if ($failedMatch.Success) { $failed = $failedMatch.Groups[1].Value }
 
-          # Формируем понятное сообщение для Telegram.
-          if ($env:TEST_OUTCOME -eq "success") {
-            $status = "✅ Успешно"
-          }
-          else {
-            $status = "❌ Есть ошибки"
-          }
-
-          $message = @(
-            "Android UI tests"
-            "Статус: $status"
-            "Набор: $env:TEST_SCOPE"
-            "Passed: $passed"
-            "Failed: $failed"
-            "Запуск: $env:RUN_URL"
-          ) -join [Environment]::NewLine
-
-          # Передаём текст через UTF-8-файл, чтобы не потерять кириллицу и переносы строк.
-          $messagePath = Join-Path $env:RUNNER_TEMP "telegram-test-run-summary.txt"
-          $message | Set-Content -Path $messagePath -Encoding utf8
-          python tools/send_telegram_report.py --message-file "$messagePath"
+          # Передаём только ASCII-данные: русский текст соберёт Python-утилита.
+          python tools/send_telegram_report.py `
+            --test-run-summary `
+            --test-outcome "$env:TEST_OUTCOME" `
+            --test-scope "$env:TEST_SCOPE" `
+            --passed "$passed" `
+            --failed "$failed" `
+            --run-url "$env:RUN_URL"
 
       - name: Сохранить Allure-результаты и артефакты
         if: always()

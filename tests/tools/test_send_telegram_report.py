@@ -14,12 +14,21 @@ def load_telegram_report_module():
     return module
 
 
-def test_reads_russian_multiline_message_from_utf8_bom_file(tmp_path):
-    """Утилита сохраняет кириллицу и переносы строк из файла PowerShell."""
-    message = "Статус: ✅ Успешно\nНабор: smoke\nPassed: 4"
-    message_file = tmp_path / "telegram-message.txt"
-    message_file.write_bytes(b"\xef\xbb\xbf" + message.encode("utf-8"))
-
+def test_builds_russian_multiline_summary_for_successful_test_run():
+    """Утилита формирует понятную Telegram-сводку без участия PowerShell."""
     telegram_report = load_telegram_report_module()
 
-    assert telegram_report.read_message_from_file(message_file) == message
+    assert telegram_report.build_test_run_summary(
+        outcome="success",
+        test_scope="smoke",
+        passed="4",
+        failed="0",
+        run_url="https://example.test/actions/runs/1",
+    ) == (
+        "Android UI tests\n"
+        "Статус: ✅ Успешно\n"
+        "Набор: smoke\n"
+        "Passed: 4\n"
+        "Failed: 0\n"
+        "Запуск: https://example.test/actions/runs/1"
+    )

@@ -4,7 +4,6 @@ import argparse
 import json
 import os
 import sys
-from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -17,9 +16,25 @@ def get_required_environment_variable(name: str) -> str:
     return value
 
 
-def read_message_from_file(message_file: Path) -> str:
-    """Считывает текст уведомления из UTF-8-файла, созданного PowerShell."""
-    return message_file.read_text(encoding="utf-8-sig")
+def build_test_run_summary(
+    outcome: str,
+    test_scope: str,
+    passed: str,
+    failed: str,
+    run_url: str,
+) -> str:
+    """Формирует русскоязычную сводку о прогоне UI-тестов."""
+    status = "✅ Успешно" if outcome == "success" else "❌ Есть ошибки"
+    return "\n".join(
+        (
+            "Android UI tests",
+            f"Статус: {status}",
+            f"Набор: {test_scope}",
+            f"Passed: {passed}",
+            f"Failed: {failed}",
+            f"Запуск: {run_url}",
+        )
+    )
 
 
 def send_telegram_message(token: str, chat_id: str, message: str) -> None:
@@ -44,17 +59,30 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Отправка сообщения в Telegram")
     message_source = parser.add_mutually_exclusive_group(required=True)
     message_source.add_argument("--message", help="Текст сообщения")
-    message_source.add_argument(
-        "--message-file",
-        type=Path,
-        help="Путь к UTF-8-файлу с текстом сообщения",
-    )
+    message_source.add_argument("--test-run-summary", action="store_true")
+    parser.add_argument("--test-outcome", help="Результат прогона pytest")
+    parser.add_argument("--test-scope", help="Маркер запущенной группы тестов")
+    parser.add_argument("--passed", help="Количество успешных тестов")
+    parser.add_argument("--failed", help="Количество упавших тестов")
+    parser.add_argument("--run-url", help="Ссылка на запуск GitHub Actions")
     args = parser.parse_args()
 
     try:
         token = get_required_environment_variable("TELEGRAM_BOT_TOKEN")
         chat_id = get_required_environment_variable("TELEGRAM_CHAT_ID")
-        message = args.message or read_message_from_file(args.message_file)
+        if args.test_run_summary:
+            summary_arguments = (
+                args.test_outcome,
+                args.test_scope,
+                args.passed,
+                args.failed,
+                args.run_url,
+            )
+            if not all(summary_arguments):
+                raise RuntimeError("Не заданы данные для сводки о прогоне тестов")
+            message = build_test_run_summary(*summary_arguments)
+        else:
+            message = args.message
         send_telegram_message(token, chat_id, message)
     except (HTTPError, URLError, RuntimeError) as error:
         print(f"Не удалось отправить уведомление в Telegram: {error}", file=sys.stderr)
