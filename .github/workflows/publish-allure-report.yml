@@ -18,14 +18,15 @@ concurrency:
 jobs:
   publish:
     name: Build and publish Allure report
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Скачать Allure-результаты успешного запуска
+      - name: Скачать Allure-результаты текущего запуска
+        id: download_allure
+        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: allure-and-artifacts-${{ github.event.workflow_run.run_number }}
@@ -33,7 +34,18 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Проверить наличие Allure-результатов
+        id: allure_results
+        if: ${{ always() }}
+        run: |
+          if [ -d downloaded-artifact/allure-results ] && find downloaded-artifact/allure-results -type f -name '*-result.json' -print -quit | grep -q .; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Установить Allure CLI
+        if: ${{ steps.allure_results.outputs.available == 'true' }}
         env:
           ALLURE_VERSION: 2.46.1
         run: |
@@ -41,10 +53,17 @@ jobs:
           tar -xzf allure.tgz
 
       - name: Собрать HTML-отчёт Allure
+        if: ${{ steps.allure_results.outputs.available == 'true' }}
         env:
           ALLURE_VERSION: 2.46.1
         run: |
           ./allure-${ALLURE_VERSION}/bin/allure generate downloaded-artifact/allure-results --clean --output allure-report
+
+      - name: Подготовить страницу при отсутствии Allure-результатов
+        if: ${{ steps.allure_results.outputs.available != 'true' }}
+        run: |
+          mkdir -p allure-report
+          cp .github/allure-report-unavailable.html allure-report/index.html
 
       - name: Подготовить GitHub Pages
         uses: actions/configure-pages@v5
