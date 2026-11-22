@@ -101,7 +101,10 @@ jobs:
             "Запуск: $env:RUN_URL"
           ) -join [Environment]::NewLine
 
-          python tools/send_telegram_report.py --message "$message"
+          # Передаём текст через UTF-8-файл, чтобы не потерять кириллицу и переносы строк.
+          $messagePath = Join-Path $env:RUNNER_TEMP "telegram-test-run-summary.txt"
+          $message | Set-Content -Path $messagePath -Encoding utf8
+          python tools/send_telegram_report.py --message-file "$messagePath"
 
       - name: Сохранить Allure-результаты и артефакты
         if: always()
