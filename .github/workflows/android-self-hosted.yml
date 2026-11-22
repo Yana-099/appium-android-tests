@@ -13,7 +13,6 @@ on:
           - regression
           - negative
           - known_bug
-          - demo_three
 
 concurrency:
   group: android-emulator-5554
@@ -60,16 +59,8 @@ jobs:
           # Создаём каталог для вывода pytest и будущих артефактов.
           New-Item -ItemType Directory -Force -Path artifacts | Out-Null
 
-          # Для демонстрации запускаем три фиксированных стабильных сценария.
-          if ("${{ inputs.test_scope }}" -eq "demo_three") {
-            python -m pytest `
-              tests/login/test_login_form.py `
-              tests/login/test_amt_1_valid_login.py `
-              tests/login/test_amt_2_logout.py -v 2>&1 | Tee-Object -FilePath artifacts/pytest-output.txt
-          }
-          else {
-            python -m pytest -m "${{ inputs.test_scope }}" -v 2>&1 | Tee-Object -FilePath artifacts/pytest-output.txt
-          }
+          # Запускаем выбранную группу тестов и сохраняем её вывод.
+          python -m pytest -m "${{ inputs.test_scope }}" -v 2>&1 | Tee-Object -FilePath artifacts/pytest-output.txt
 
           # Сохраняем результат pytest, чтобы следующие шаги выполнились даже при падении тестов.
           $pytestExitCode = $LASTEXITCODE
