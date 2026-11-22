@@ -8,7 +8,10 @@ class MenuPage(BasePage):
     MENU_BUTTON = (AppiumBy.ACCESSIBILITY_ID, "View menu")
     LOGIN_ITEM = (AppiumBy.ACCESSIBILITY_ID, "Login Menu Item")
     LOGOUT_ITEM = (AppiumBy.ACCESSIBILITY_ID, "Logout Menu Item")
-    LOGOUT_DIALOG_TITLE = (By.ID, "android:id/alertTitle")
+    LOGOUT_DIALOG_TITLE = (
+        By.ID,
+        "com.saucelabs.mydemoapp.android:id/alertTitle",
+    )
     LOGOUT_DIALOG_MESSAGE = (By.ID, "android:id/message")
     CANCEL_LOGOUT_BUTTON = (By.ID, "android:id/button2")
     CONFIRM_LOGOUT_BUTTON = (By.ID, "android:id/button1")
