@@ -11,3 +11,6 @@ allure-report/
 artifacts/
 *.log
 tools/
+!tools/
+tools/*
+!tools/send_telegram_report.py

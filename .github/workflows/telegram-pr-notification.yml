@@ -1,0 +1,31 @@
+name: Telegram PR notification
+
+on:
+  pull_request:
+    types: [opened, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    name: Notify about pull request
+    if: ${{ github.event.pull_request.head.repo.fork == false }}
+    runs-on: ubuntu-latest
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+    steps:
+      - name: Получить код проекта
+        uses: actions/checkout@v6
+
+      - name: Отправить уведомление в Telegram
+        if: ${{ env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
+        env:
+          TELEGRAM_MESSAGE: |
+            Новый pull request: #${{ github.event.pull_request.number }} — ${{ github.event.pull_request.title }}
+            Автор: ${{ github.event.pull_request.user.login }}
+            Ветка: ${{ github.event.pull_request.head.ref }} → ${{ github.event.pull_request.base.ref }}
+            ${{ github.event.pull_request.html_url }}
+        run: python tools/send_telegram_report.py --message "$TELEGRAM_MESSAGE"
