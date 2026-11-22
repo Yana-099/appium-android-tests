@@ -23,6 +23,9 @@ jobs:
     name: Run ${{ inputs.test_scope }} tests
     runs-on: [self-hosted, windows, appium]
     timeout-minutes: 30
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
 
     defaults:
       run:
@@ -51,7 +54,54 @@ jobs:
           }
 
       - name: Запустить выбранную группу тестов
-        run: python -m pytest -m "${{ inputs.test_scope }}" -v
+        id: run_tests
+        run: |
+          # Создаём каталог для вывода pytest и будущих артефактов.
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+
+          # Запускаем выбранную группу тестов и сохраняем её вывод.
+          python -m pytest -m "${{ inputs.test_scope }}" -v 2>&1 | Tee-Object -FilePath artifacts/pytest-output.txt
+
+          # Сохраняем результат pytest, чтобы следующие шаги выполнились даже при падении тестов.
+          $pytestExitCode = $LASTEXITCODE
+          "exit_code=$pytestExitCode" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          exit $pytestExitCode
+
+      - name: Отправить итоги прогона в Telegram
+        if: ${{ always() && env.TELEGRAM_BOT_TOKEN != '' && env.TELEGRAM_CHAT_ID != '' }}
+        env:
+          TEST_SCOPE: ${{ inputs.test_scope }}
+          TEST_OUTCOME: ${{ steps.run_tests.outcome }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          # Читаем сохранённый вывод pytest для подсчёта результатов.
+          $pytestOutput = Get-Content -Raw -Path artifacts/pytest-output.txt -ErrorAction SilentlyContinue
+          $passed = 0
+          $failed = 0
+          $passedMatch = [regex]::Match($pytestOutput, "(?<!\d)(\d+) passed")
+          $failedMatch = [regex]::Match($pytestOutput, "(?<!\d)(\d+) failed")
+
+          if ($passedMatch.Success) { $passed = $passedMatch.Groups[1].Value }
+          if ($failedMatch.Success) { $failed = $failedMatch.Groups[1].Value }
+
+          # Формируем понятное сообщение для Telegram.
+          if ($env:TEST_OUTCOME -eq "success") {
+            $status = "✅ Успешно"
+          }
+          else {
+            $status = "❌ Есть ошибки"
+          }
+
+          $message = @"
+Android UI tests
+Статус: $status
+Набор: $env:TEST_SCOPE
+Passed: $passed
+Failed: $failed
+Запуск: $env:RUN_URL
+"@
+
+          python tools/send_telegram_report.py --message "$message"
 
       - name: Сохранить Allure-результаты и артефакты
         if: always()
