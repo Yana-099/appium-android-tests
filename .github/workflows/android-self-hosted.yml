@@ -92,14 +92,14 @@ jobs:
             $status = "❌ Есть ошибки"
           }
 
-          $message = @"
-Android UI tests
-Статус: $status
-Набор: $env:TEST_SCOPE
-Passed: $passed
-Failed: $failed
-Запуск: $env:RUN_URL
-"@
+          $message = @(
+            "Android UI tests"
+            "Статус: $status"
+            "Набор: $env:TEST_SCOPE"
+            "Passed: $passed"
+            "Failed: $failed"
+            "Запуск: $env:RUN_URL"
+          ) -join [Environment]::NewLine
 
           python tools/send_telegram_report.py --message "$message"
 
