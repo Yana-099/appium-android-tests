@@ -15,15 +15,12 @@ from pages.products_page import ProductsPage
 @allure.title("Добавление первого товара в корзину")
 def test_add_first_product_to_cart(driver):
     # Открываем каталог и запоминаем название первого товара.
-    with allure.step("Открыть первый товар в каталоге"):
-        products_page = ProductsPage(driver).wait_until_loaded()
-        product_name = products_page.open_first_product()
+    products_page = ProductsPage(driver).wait_until_loaded()
+    product_name = products_page.open_first_product()
 
     # Добавляем выбранный товар в корзину и открываем её.
-    with allure.step("Добавить товар в корзину"):
-        ProductDetailsPage(driver).add_to_cart()
-    with allure.step("Открыть корзину"):
-        CartPage(driver).open()
+    ProductDetailsPage(driver).add_to_cart()
+    CartPage(driver).open()
 
     # Проверяем, что выбранный товар отображается в корзине.
     with allure.step("Проверить наличие выбранного товара в корзине"):

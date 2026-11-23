@@ -1,3 +1,4 @@
+import allure
 from selenium.webdriver.common.by import By
 
 from config.settings import APP_PACKAGE
@@ -53,6 +54,7 @@ class CheckoutShippingPage(BasePage):
     def is_to_payment_available(self) -> bool:
         return self.clickable(self.TO_PAYMENT_BUTTON).is_enabled()
 
+    @allure.step("Нажать кнопку To Payment")
     def go_to_payment(self):
         self.click(self.TO_PAYMENT_BUTTON)
 

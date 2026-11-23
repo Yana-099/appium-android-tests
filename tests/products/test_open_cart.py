@@ -14,16 +14,13 @@ from pages.products_page import ProductsPage
 @allure.title("Пользователь открывает корзину с добавленным товаром")
 def test_user_can_open_cart_with_added_product(driver):
     # Нажимаем на карточку первого товара в каталоге.
-    with allure.step("Нажать на карточку первого товара"):
-        product_name = ProductsPage(driver).wait_until_loaded().open_first_product()
+    product_name = ProductsPage(driver).wait_until_loaded().open_first_product()
 
     # Нажимаем кнопку Add to cart.
-    with allure.step("Нажать кнопку Add to cart"):
-        ProductDetailsPage(driver).add_to_cart()
+    ProductDetailsPage(driver).add_to_cart()
 
     # Нажимаем на иконку корзины.
-    with allure.step("Нажать на иконку корзины"):
-        cart_page = CartPage(driver).open()
+    cart_page = CartPage(driver).open()
 
     # Проверяем страницу корзины и добавленный товар.
     with allure.step("Проверить товар в корзине"):

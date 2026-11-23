@@ -1,3 +1,4 @@
+import allure
 from selenium.webdriver.common.by import By
 
 from config.settings import APP_PACKAGE
@@ -9,6 +10,7 @@ class CartPage(BasePage):
     TITLE = (By.ID, f"{APP_PACKAGE}:id/productTV")
     PROCEED_TO_CHECKOUT_BUTTON = (By.ID, f"{APP_PACKAGE}:id/cartBt")
 
+    @allure.step("Нажать на иконку корзины")
     def open(self):
         self.click(self.CART_BUTTON)
         return self
@@ -24,5 +26,6 @@ class CartPage(BasePage):
     def is_proceed_to_checkout_available(self) -> bool:
         return self.clickable(self.PROCEED_TO_CHECKOUT_BUTTON).is_enabled()
 
+    @allure.step("Нажать кнопку Proceed To Checkout")
     def proceed_to_checkout(self):
         self.click(self.PROCEED_TO_CHECKOUT_BUTTON)

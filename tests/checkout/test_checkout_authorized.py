@@ -32,22 +32,20 @@ from pages.products_page import ProductsPage
 @allure.title("Авторизованный пользователь оформляет заказ с первым товаром")
 def test_authorized_user_places_order(authorized_driver):
     # Открываем карточку первого товара каталога.
-    with allure.step("Нажать на карточку первого товара"):
-        selected_product = ProductsPage(authorized_driver).wait_until_loaded().open_first_product()
+    selected_product = ProductsPage(authorized_driver).wait_until_loaded().open_first_product()
 
     # Добавляем выбранный товар в корзину.
-    with allure.step("Нажать кнопку Add to cart"):
-        ProductDetailsPage(authorized_driver).add_to_cart()
+    ProductDetailsPage(authorized_driver).add_to_cart()
 
     # Открываем корзину с добавленным товаром.
-    with allure.step("Нажать на иконку корзины"):
-        CartPage(authorized_driver).open()
+    CartPage(authorized_driver).open()
+    with allure.step("Проверить выбранный товар в корзине"):
         assert CartPage(authorized_driver).contains_product(selected_product)
 
     # Открываем форму доставки.
-    with allure.step("Нажать кнопку Proceed To Checkout"):
-        CartPage(authorized_driver).proceed_to_checkout()
-        shipping_page = CheckoutShippingPage(authorized_driver)
+    CartPage(authorized_driver).proceed_to_checkout()
+    shipping_page = CheckoutShippingPage(authorized_driver)
+    with allure.step("Проверить открытие формы доставки"):
         assert shipping_page.title == "Checkout"
 
     # Заполняем все поля формы доставки перед переходом к оплате.
@@ -72,9 +70,9 @@ def test_authorized_user_places_order(authorized_driver):
         assert not shipping_page.has_validation_errors
 
     # Открываем форму способа оплаты.
-    with allure.step("Нажать кнопку To Payment"):
-        shipping_page.go_to_payment()
-        payment_page = CheckoutPaymentPage(authorized_driver)
+    shipping_page.go_to_payment()
+    payment_page = CheckoutPaymentPage(authorized_driver)
+    with allure.step("Проверить открытие формы оплаты"):
         assert payment_page.title == "Checkout"
 
     # Заполняем все поля формы оплаты перед проверкой заказа.

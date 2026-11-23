@@ -14,9 +14,8 @@ from pages.products_page import ProductsPage
 @allure.title("Карточка первого товара содержит основные элементы")
 def test_first_product_card_displays_required_information(driver):
     # Нажимаем на карточку первого товара в каталоге.
-    with allure.step("Нажать на карточку первого товара"):
-        selected_product_name = ProductsPage(driver).wait_until_loaded().open_first_product()
-        product_details_page = ProductDetailsPage(driver)
+    selected_product_name = ProductsPage(driver).wait_until_loaded().open_first_product()
+    product_details_page = ProductDetailsPage(driver)
 
     # Проверяем название выбранного товара.
     with allure.step("Проверить название выбранного товара"):
