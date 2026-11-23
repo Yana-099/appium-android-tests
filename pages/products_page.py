@@ -1,3 +1,4 @@
+import allure
 from selenium.webdriver.common.by import By
 
 from config.settings import APP_PACKAGE
@@ -19,6 +20,7 @@ class ProductsPage(BasePage):
     def is_open(self) -> bool:
         return self.visible(self.TITLE).text == "Products"
 
+    @allure.step("Нажать на карточку первого товара")
     def open_first_product(self) -> str:
         product_titles = self.wait.until(
             lambda driver: driver.find_elements(*self.PRODUCT_TITLE)

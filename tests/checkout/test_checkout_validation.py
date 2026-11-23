@@ -16,25 +16,20 @@ from pages.products_page import ProductsPage
 @allure.title("Обязательные поля доставки показывают точные сообщения об ошибках")
 def test_checkout_shipping_required_fields_show_validation_messages(authorized_driver):
     # Нажимаем на карточку первого товара в каталоге.
-    with allure.step("Нажать на карточку первого товара"):
-        ProductsPage(authorized_driver).wait_until_loaded().open_first_product()
+    ProductsPage(authorized_driver).wait_until_loaded().open_first_product()
 
     # Нажимаем кнопку Add to cart.
-    with allure.step("Нажать кнопку Add to cart"):
-        ProductDetailsPage(authorized_driver).add_to_cart()
+    ProductDetailsPage(authorized_driver).add_to_cart()
 
     # Нажимаем на иконку корзины.
-    with allure.step("Нажать на иконку корзины"):
-        CartPage(authorized_driver).open()
+    CartPage(authorized_driver).open()
 
     # Нажимаем кнопку Proceed To Checkout.
-    with allure.step("Нажать кнопку Proceed To Checkout"):
-        CartPage(authorized_driver).proceed_to_checkout()
-        checkout_page = CheckoutShippingPage(authorized_driver)
+    CartPage(authorized_driver).proceed_to_checkout()
+    checkout_page = CheckoutShippingPage(authorized_driver)
 
     # Нажимаем кнопку To Payment с незаполненными обязательными полями.
-    with allure.step("Нажать кнопку To Payment"):
-        checkout_page.go_to_payment()
+    checkout_page.go_to_payment()
 
     # Проверяем точные сообщения под обязательными полями.
     with allure.step("Проверить сообщения валидации обязательных полей"):

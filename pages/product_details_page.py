@@ -1,3 +1,4 @@
+import allure
 from selenium.webdriver.common.by import By
 
 from config.settings import APP_PACKAGE
@@ -44,5 +45,6 @@ class ProductDetailsPage(BasePage):
         right = window_width - self.VISUAL_RIGHT_INSET
         return 0, top, right, bottom
 
+    @allure.step("Нажать кнопку Add to cart")
     def add_to_cart(self):
         self.click(self.ADD_TO_CART_BUTTON)

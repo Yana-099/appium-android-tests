@@ -21,6 +21,16 @@ The project demonstrates a maintainable mobile test automation framework built w
 - pytest markers: `smoke`, `regression`, `negative`, `known_bug`, `visual`, and `crash_demo`.
 - A deliberately failing crash demonstration is isolated and runs only with `--run-crash-demo`.
 
+## Allure step design
+
+The project uses a hybrid approach to Allure steps:
+
+- Reusable UI actions, such as opening a product, adding it to the cart, opening the cart, and proceeding through Checkout, are declared with `@allure.step` in Page Object methods.
+- Scenario-specific business checks, form validation, lifecycle actions, diagnostic attachments, and assertions remain explicit `with allure.step(...)` blocks in the test files.
+- Soft assertions are intentionally not used: the project uses regular `assert` statements so a critical scenario stops at the exact point of failure.
+
+This keeps repeated implementation details in one place while preserving clear, business-readable steps in Allure reports.
+
 ## Tech stack
 
 - Python 3
