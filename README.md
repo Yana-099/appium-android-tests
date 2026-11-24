@@ -18,8 +18,12 @@ The project demonstrates a maintainable mobile test automation framework built w
 - Allure steps, labels, screenshots, page source, and Android logcat attachments on failure.
 - Pillow-based visual regression test with baseline, actual, diff, and comparison metrics in Allure.
 - Centralized test data in `config/test_data.py`.
-- pytest markers: `smoke`, `regression`, `negative`, `known_bug`, `visual`, and `crash_demo`.
+- pytest markers: `smoke`, `regression`, `negative`, `visual`, and `crash_demo`.
 - A deliberately failing crash demonstration is isolated and runs only with `--run-crash-demo`.
+
+## Portfolio scope
+
+The mobile suite is intentionally curated rather than optimized for test count. Each retained scenario demonstrates either distinct business coverage or a separate automation capability, such as Android lifecycle handling, ADB interaction, visual comparison, failure diagnostics, or parameterized device profiles. Redundant checks and persistently unstable scenarios are kept out of the automated portfolio suite so its regular runs remain focused and trustworthy.
 
 ## Allure step design
 
@@ -91,7 +95,7 @@ pip install -r requirements.txt
 Run one specific test file:
 
 ```bash
-pytest tests/login/test_authorization.py -v
+pytest tests/login/test_valid_login.py -v
 ```
 
 Run tests with a marker:
@@ -100,7 +104,6 @@ Run tests with a marker:
 pytest -m smoke -v
 pytest -m regression -v
 pytest -m negative -v
-pytest -m known_bug -v
 pytest -m visual -v
 ```
 

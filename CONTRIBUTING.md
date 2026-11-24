@@ -56,7 +56,7 @@ appium --address 127.0.0.1 --port 4723
 Запуск одного тестового файла:
 
 ```powershell
-python -m pytest tests/login/test_login_form.py -v
+python -m pytest tests/login/test_valid_login.py -v
 ```
 
 Запуск smoke-набора:
@@ -70,7 +70,7 @@ python -m pytest -m smoke -v
 ```powershell
 python -m pytest -m regression -v
 python -m pytest -m negative -v
-python -m pytest -m known_bug -v
+python -m pytest -m visual -v
 ```
 
 Демонстрация падения приложения изолирована и не входит в обычные запуски. Запускайте её только явно:
