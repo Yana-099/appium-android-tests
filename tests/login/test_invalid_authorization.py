@@ -15,18 +15,17 @@ EXPECTED_LOGIN_ERROR = "Provided credentials do not match any user in this servi
 @allure.story("Неверные учётные данные")
 @allure.title("Пользователь видит понятную ошибку при неверном пароле")
 def test_invalid_password_shows_authorization_error(driver):
-    # Открываем форму login и вводим существующий логин с неверным паролем.
-    with allure.step("Ввести существующий логин и неверный пароль"):
+    with allure.step("Открыть форму Login"):
         login_page = LoginPage(driver).open()
-        login_page.login(STANDARD_USERNAME, INVALID_PASSWORD)
 
-    # Фиксируем состояние экрана с сообщением об ошибке для отчёта Allure.
-    with allure.step("Приложить скриншот сообщения об ошибке"):
-        allure.attach(
-            driver.get_screenshot_as_png(),
-            name="Ошибка авторизации при неверном пароле",
-            attachment_type=allure.attachment_type.PNG,
-        )
+    with allure.step("Ввести существующий логин"):
+        login_page.enter_username(STANDARD_USERNAME)
+
+    with allure.step("Ввести неверный пароль"):
+        login_page.enter_password(INVALID_PASSWORD)
+
+    with allure.step("Нажать Login"):
+        login_page.submit_login()
 
     # Проверяем, что неверный пароль не авторизовал пользователя.
     with allure.step("Проверить, что пользователь остался на форме Login"):
