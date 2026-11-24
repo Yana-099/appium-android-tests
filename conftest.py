@@ -1,11 +1,15 @@
-from pathlib import Path
-
 import allure
 import pytest
 from appium import webdriver
 from allure_commons.types import AttachmentType
 
 from config.capabilities import create_android_options
+from config.device_profiles import (
+    DEFAULT_DEVICE_PROFILE,
+    DEVICE_PROFILES,
+    DeviceProfile,
+    get_device_profile,
+)
 from config.settings import APP_PACKAGE, APPIUM_SERVER_URL
 from config.test_data import STANDARD_PASSWORD, STANDARD_USERNAME
 from pages.login_page import LoginPage
@@ -15,14 +19,30 @@ from utils.allure_environment import write_allure_environment
 from utils.allure_results import remove_internal_fixture_steps
 from utils.screenshots import save_failure_screenshot
 
+DEVICE_PROFILE_KEY = pytest.StashKey[DeviceProfile]()
+
 
 def pytest_addoption(parser):
+    parser.addoption(
+        "--device",
+        action="store",
+        choices=tuple(DEVICE_PROFILES),
+        default=DEFAULT_DEVICE_PROFILE,
+        help="Android device profile used for this test run",
+    )
     parser.addoption(
         "--run-crash-demo",
         action="store_true",
         default=False,
         help="run intentionally failing crash demonstration tests",
     )
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_configure(config):
+    device_profile = get_device_profile(config.getoption("--device"))
+    config.stash[DEVICE_PROFILE_KEY] = device_profile
+    config.option.allure_report_dir = str(device_profile.allure_results_dir)
 
 
 def pytest_collection_modifyitems(config, items):
@@ -37,10 +57,18 @@ def pytest_collection_modifyitems(config, items):
             item.add_marker(skip_crash_demo)
 
 
+@pytest.fixture(scope="session")
+def device_profile(pytestconfig) -> DeviceProfile:
+    return pytestconfig.stash[DEVICE_PROFILE_KEY]
+
+
 @pytest.fixture
-def driver(request):
-    write_allure_environment()
-    session = webdriver.Remote(APPIUM_SERVER_URL, options=create_android_options())
+def driver(request, device_profile):
+    write_allure_environment(device_profile)
+    session = webdriver.Remote(
+        APPIUM_SERVER_URL,
+        options=create_android_options(device_profile),
+    )
 
     def close_appium_session():
         with allure.step("Закрыть Appium-сессию"):
@@ -65,6 +93,7 @@ def pytest_runtest_makereport(item, call):
     if report.when == "call" and report.failed:
         session = item.funcargs.get("driver")
         if session:
+            device_profile = item.funcargs["device_profile"]
             screenshot_path = save_failure_screenshot(session, item.name)
             allure.attach.file(
                 str(screenshot_path),
@@ -79,7 +108,11 @@ def pytest_runtest_makereport(item, call):
             try:
                 is_crash_demo = "crash_demo" in item.keywords
                 allure.attach(
-                    get_crash_logcat(APP_PACKAGE) if is_crash_demo else get_logcat(),
+                    (
+                        get_crash_logcat(device_profile.udid, APP_PACKAGE)
+                        if is_crash_demo
+                        else get_logcat(device_profile.udid)
+                    ),
                     name=(
                         "Android logcat: причина аварийного завершения"
                         if is_crash_demo
@@ -97,4 +130,5 @@ def pytest_runtest_makereport(item, call):
 
 @pytest.hookimpl(trylast=True)
 def pytest_sessionfinish(session, exitstatus):
-    remove_internal_fixture_steps(results_dir=Path("allure-results"))
+    device_profile = session.config.stash[DEVICE_PROFILE_KEY]
+    remove_internal_fixture_steps(results_dir=device_profile.allure_results_dir)

@@ -13,15 +13,8 @@ from pages.products_page import ProductsPage
 from utils.visual_comparison import compare_images
 
 
-BASELINE_PATH = (
-    Path(__file__).parent
-    / "baselines"
-    / "android-emulator-5554"
-    / "product_card.png"
-)
+BASELINES_DIR = Path(__file__).parent / "baselines"
 ARTIFACTS_DIR = Path("artifacts") / "visual"
-ACTUAL_PATH = ARTIFACTS_DIR / "product_card_actual.png"
-DIFF_PATH = ARTIFACTS_DIR / "product_card_diff.png"
 CHANNEL_TOLERANCE = 8
 MAX_CHANGED_RATIO = 0.001
 
@@ -38,49 +31,56 @@ def save_region_screenshot(driver, region: tuple[int, int, int, int], path: Path
 @allure.feature("Визуальная регрессия")
 @allure.story("Карточка товара")
 @allure.title("Карточка первого товара соответствует визуальному эталону")
-def test_first_product_card_matches_visual_baseline(driver):
+def test_first_product_card_matches_visual_baseline(driver, device_profile):
+    baseline_path = (
+        BASELINES_DIR / device_profile.visual_baseline_dir / "product_card.png"
+    )
+    artifacts_dir = ARTIFACTS_DIR / device_profile.name
+    actual_path = artifacts_dir / "product_card_actual.png"
+    diff_path = artifacts_dir / "product_card_diff.png"
+
     with allure.step("Открыть карточку первого товара"):
         ProductsPage(driver).wait_until_loaded().open_first_product()
         product_details_page = ProductDetailsPage(driver)
 
     with allure.step("Сохранить стабильную область карточки товара"):
-        save_region_screenshot(driver, product_details_page.visual_region, ACTUAL_PATH)
+        save_region_screenshot(driver, product_details_page.visual_region, actual_path)
 
-    if not BASELINE_PATH.exists():
+    if not baseline_path.exists():
         allure.attach.file(
-            str(ACTUAL_PATH),
+            str(actual_path),
             name="Фактический результат",
             attachment_type=AttachmentType.PNG,
         )
         pytest.fail(
             "Visual baseline is missing. Review "
-            f"{ACTUAL_PATH} and copy it to {BASELINE_PATH}."
+            f"{actual_path} and copy it to {baseline_path}."
         )
 
     with allure.step("Сравнить карточку товара с визуальным эталоном"):
         allure.attach.file(
-            str(BASELINE_PATH),
+            str(baseline_path),
             name="Визуальный эталон",
             attachment_type=AttachmentType.PNG,
         )
         allure.attach.file(
-            str(ACTUAL_PATH),
+            str(actual_path),
             name="Фактический результат",
             attachment_type=AttachmentType.PNG,
         )
-        DIFF_PATH.unlink(missing_ok=True)
+        diff_path.unlink(missing_ok=True)
         try:
             result = compare_images(
-                BASELINE_PATH,
-                ACTUAL_PATH,
-                DIFF_PATH,
+                baseline_path,
+                actual_path,
+                diff_path,
                 channel_tolerance=CHANNEL_TOLERANCE,
                 max_changed_ratio=MAX_CHANGED_RATIO,
             )
         except (OSError, ValueError) as error:
-            if DIFF_PATH.exists():
+            if diff_path.exists():
                 allure.attach.file(
-                    str(DIFF_PATH),
+                    str(diff_path),
                     name="Диагностика несовместимых изображений",
                     attachment_type=AttachmentType.PNG,
                 )
@@ -97,7 +97,7 @@ def test_first_product_card_matches_visual_baseline(driver):
             )
             raise
         allure.attach.file(
-            str(DIFF_PATH),
+            str(diff_path),
             name="Визуальная разница",
             attachment_type=AttachmentType.PNG,
         )

@@ -14,7 +14,7 @@ from utils.android_device import crash_application
 @allure.feature("Жизненный цикл приложения")
 @allure.story("Аварийное завершение")
 @allure.title("Демонстрация Android logcat после аварийного завершения приложения")
-def test_crash_demo_attaches_android_logcat(driver):
+def test_crash_demo_attaches_android_logcat(driver, device_profile):
     # Выполняем предусловие: открываем карточку первого товара.
     with allure.step("Предусловие: открыть карточку первого товара"):
         selected_product = ProductsPage(driver).wait_until_loaded().open_first_product()
@@ -23,7 +23,7 @@ def test_crash_demo_attaches_android_logcat(driver):
 
     # Имитируем аварийное завершение процесса приложения через ADB.
     with allure.step("Принудительно аварийно завершить приложение через ADB"):
-        crash_application(APP_PACKAGE)
+        crash_application(device_profile.udid, APP_PACKAGE)
 
     # Завершаем demo-кейс понятной ошибкой для формирования вложений Allure.
     with allure.step("Зафиксировать аварийное завершение в отчёте"):

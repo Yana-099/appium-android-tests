@@ -61,9 +61,10 @@ Before running the tests, make sure you have:
 4. The Sauce Labs My Demo App installed on the target device.
 5. Allure CLI installed if you want to open Allure reports.
 
-The current local configuration is stored in `config/settings.py`:
+The shared Appium configuration is stored in `config/settings.py`, while named devices are defined in `config/device_profiles.py`:
 
-- device: `emulator-5554`
+- default profile: `pixel_api31` (`emulator-5554`)
+- additional profile: `small_phone_api34` (`emulator-5556`)
 - Appium server: `http://127.0.0.1:4723`
 - application id: `com.saucelabs.mydemoapp.android`
 
@@ -102,6 +103,15 @@ pytest -m negative -v
 pytest -m known_bug -v
 pytest -m visual -v
 ```
+
+Select a device profile when pytest starts:
+
+```powershell
+pytest -m smoke --device pixel_api31
+pytest -m smoke --device small_phone_api34
+```
+
+When `--device` is omitted, pytest uses `pixel_api31` to preserve the existing local workflow. The Small Phone profile expects its emulator to be available as `emulator-5556`.
 
 The crash diagnostic demonstration is intentionally failing and skipped by default. Run it explicitly only when needed:
 
@@ -148,6 +158,17 @@ allure serve allure-results
 ## Test data and safety
 
 Credentials and payment values in `config/test_data.py` are public demo data for the test application; they are not personal or production credentials. Do not add real secrets, tokens, or personal data to the repository.
+
+## Device profiles and multi-device execution
+
+Each pytest process runs on one selected Android device profile. The available profiles are:
+
+- `pixel_api31` — the current Pixel 6 emulator and default profile;
+- `small_phone_api34` — a lightweight Small Phone emulator with Android 14 / API 34, Google APIs x86_64, 2 CPU cores, and 2 GB RAM.
+
+Each profile provides its own UDID, Android version, UiAutomator2 system port, visual-baseline directory, and Allure results directory. The default profile keeps `allure-results/`; the Small Phone profile writes to `allure-results-small_phone_api34/`.
+
+Several profiles can be tested sequentially by running pytest once per profile. Parallel execution is technically possible with the separate UDIDs, system ports, and result directories, but it is intentionally not implemented to keep this portfolio project simple. A later GitHub Actions update may add a device selector and an `all` option that runs these commands sequentially.
 
 ## Notes
 
