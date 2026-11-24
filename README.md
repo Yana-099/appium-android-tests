@@ -159,6 +159,39 @@ Pytest записывает сырые результаты в `allure-results/`
 allure serve allure-results
 ```
 
+## Демонстрация одного сценария на двух устройствах
+
+PowerShell-скрипт запускает один и тот же тест последовательно на обоих профилях. Перед стартом pytest он проверяет, что `emulator-5554` и `emulator-5556` подключены через ADB и имеют статус `device`.
+
+Запуск демонстрации стабильного сценария авторизации:
+
+```powershell
+.\tools\run_multi_device_demo.ps1
+```
+
+Путь или аргументы pytest можно переопределить одной строкой:
+
+```powershell
+.\tools\run_multi_device_demo.ps1 -TestPath "-m smoke"
+.\tools\run_multi_device_demo.ps1 -TestPath "tests/login/test_valid_login.py tests/products/test_product_card.py"
+```
+
+После выполнения скрипт выводит статус каждого профиля, UDID, `systemPort`, код завершения и каталог Allure. Результаты разделены по устройствам:
+
+| Профиль | UDID | systemPort | Allure |
+| --- | --- | ---: | --- |
+| `pixel_api31` | `emulator-5554` | `8200` | `allure-results/` |
+| `small_phone_api34` | `emulator-5556` | `8201` | `allure-results-small_phone_api34/` |
+
+Открыть отчёты можно отдельно:
+
+```powershell
+allure serve allure-results
+allure serve allure-results-small_phone_api34
+```
+
+Скрипт возвращает `exit 1`, если устройство не прошло pre-flight-проверку или тест завершился ошибкой на любом профиле.
+
 ## AI-анализ одного падения (демо)
 
 Этот проект показывает, как AI-агент может разобрать уже собранные артефакты одного упавшего мобильного теста. Демонстрационный сценарий — негативная проверка неверного пароля: в зафиксированном падении screenshot и XML показывают экран Products, хотя проверка ожидала Login.
