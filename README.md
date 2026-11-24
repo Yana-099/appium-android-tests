@@ -66,7 +66,7 @@ artifacts/  # Локальные артефакты падений (не ком�
 4. Sauce Labs My Demo App на целевом устройстве.
 5. Allure CLI, если требуется открыть Allure-отчёт.
 
-Общая конфигурация Appium находится в `config/settings.py`, именованные устройства — в `config/device_profiles.py`. Доступны профили `pixel_api31` и `small_phone_api34`; если `--device` не указан, используется `pixel_api31`.
+Общая конфигурация Appium находится в `config/settings.py`, именованные устройства — в `config/device_profiles.py`. Доступны профили `pixel_api31` и `small_phone_api34`.
 
 - сервер Appium: `http://127.0.0.1:4723`;
 - application id: `com.saucelabs.mydemoapp.android`.
@@ -75,17 +75,7 @@ artifacts/  # Локальные артефакты падений (не ком�
 
 ```powershell
 python -m venv .venv
-```
-
-Активируйте виртуальное окружение:
-
-```powershell
 .\.venv\Scripts\Activate.ps1
-```
-
-Установите зависимости проекта:
-
-```powershell
 pip install -r requirements.txt
 ```
 
@@ -97,13 +87,10 @@ pip install -r requirements.txt
 pytest tests/login/test_valid_login.py -v
 ```
 
-Запуск тестов по маркеру:
+Запуск тестов по маркеру, например `smoke` (его можно заменить на `regression`, `negative` или `visual`):
 
 ```powershell
 pytest -m smoke -v
-pytest -m regression -v
-pytest -m negative -v
-pytest -m visual -v
 ```
 
 Выбор профиля устройства при запуске pytest:
@@ -211,15 +198,13 @@ pytest
   → Markdown-вложение AI failure analysis у того же теста в Allure
 ```
 
-Если `OPENAI_API_KEY` не задан, API-вызов не выполняется: в Allure добавляется вложение с объяснением, а исходный статус pytest-теста остаётся без изменений.
-
-Скрипт анализирует уже существующий `failed`/`broken` Allure result. Для выбранного сценария он появляется, если актуальная версия демо-приложения действительно принимает неверный пароль:
+Скрипт анализирует уже существующий `failed`/`broken` Allure result и не создаёт искусственных сбоев. Для выбранного сценария такой result появляется, если актуальная версия демо-приложения действительно принимает неверный пароль:
 
 ```powershell
 pytest tests/login/test_invalid_authorization.py -v
 ```
 
-Если тест пройдёт, скрипт честно сообщит, что упавший result не найден: он не создаёт искусственные сбои ради демонстрации.
+Если тест пройдёт, скрипт сообщит, что упавший result не найден.
 
 Затем передайте ключ только через переменную окружения и запустите постобработку:
 
@@ -228,9 +213,9 @@ $env:OPENAI_API_KEY = "<your-key>"
 python tools/analyze_failure.py --results allure-results
 ```
 
-Скрипт берёт последний `failed`/`broken` result, сокращает XML и logcat, маскирует очевидные значения `token`/`password` и отправляет контекст в OpenAI Responses API. Ответ имеет три коротких поля: причина (`root_cause`), доказательства (`evidence`) и практическое исправление (`suggested_fix`). Результат выводится в консоль, сохраняется в `artifacts/ai-report.md` и добавляется к этому же тесту в Allure как Markdown-вложение **AI failure analysis**. После запуска скрипта откройте или обновите Allure-отчёт — вложение будет рядом со screenshot, page source и logcat.
+Результат выводится в консоль, сохраняется в `artifacts/ai-report.md` и добавляется к тому же тесту в Allure как Markdown-вложение **AI failure analysis**. После запуска скрипта откройте или обновите Allure-отчёт.
 
-Пример ожидаемого структурированного ответа:
+Формат структурированного ответа:
 
 ```json
 {
@@ -246,7 +231,7 @@ python tools/analyze_failure.py --results allure-results
 python tools/analyze_failure.py --results allure-results --no-screenshot
 ```
 
-Без `OPENAI_API_KEY`, при сетевой ошибке или ошибке API скрипт создаёт понятный отчёт и завершается успешно. В Allure в таком случае прикладывается то же понятное сообщение, а pytest-результат не меняется. `AI_FAILURE_MODEL` при необходимости переопределяет модель; по умолчанию используется `gpt-4o-mini`.
+`AI_FAILURE_MODEL` при необходимости переопределяет модель; по умолчанию используется `gpt-4o-mini`.
 
 ### Отказоустойчивость (Graceful Degradation) и безопасность
 
@@ -256,10 +241,8 @@ python tools/analyze_failure.py --results allure-results --no-screenshot
 
 Это сознательно компактный MVP: проект не добавляет CI-анализ, массовую обработку падений, дедупликацию или автоматическое редактирование Page Object/локаторов. AI-рекомендация всегда требует ревью человеком.
 
-## Тестовые данные и безопасность
+## Безопасность и назначение проекта
 
 Учётные данные и платёжные значения в `config/test_data.py` — публичные демонстрационные данные тестового приложения, а не персональные или боевые данные. Не добавляйте в репозиторий реальные секреты, токены или персональные данные.
-
-## Примечания
 
 Этот репозиторий предназначен для QA-портфолио по автоматизации. Локальные окружения, сгенерированные отчёты, скриншоты, логи и временные артефакты исключены из Git.
