@@ -6,7 +6,7 @@ __pycache__/
 .vscode/
 .env
 .env.*
-allure-results/
+allure-results*/
 allure-report/
 artifacts/
 *.log

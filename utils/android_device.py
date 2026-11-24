@@ -3,9 +3,6 @@ import shlex
 import subprocess
 from pathlib import Path
 
-from config.settings import DEVICE_UDID
-
-
 class AndroidDeviceCommandError(RuntimeError):
     pass
 
@@ -24,7 +21,7 @@ def _adb_environment() -> dict[str, str]:
     return environment
 
 
-def post_test_notification(title: str, text: str):
+def post_test_notification(udid: str, title: str, text: str):
     notification_command = " ".join(
         [
             "cmd",
@@ -44,7 +41,7 @@ def post_test_notification(title: str, text: str):
             [
                 "adb",
                 "-s",
-                DEVICE_UDID,
+                udid,
                 "shell",
                 notification_command,
             ],
@@ -64,10 +61,10 @@ def post_test_notification(title: str, text: str):
         raise AndroidDeviceCommandError(error_message) from error
 
 
-def crash_application(app_package: str):
+def crash_application(udid: str, app_package: str):
     try:
         subprocess.run(
-            ["adb", "-s", DEVICE_UDID, "shell", "am", "crash", app_package],
+            ["adb", "-s", udid, "shell", "am", "crash", app_package],
             check=True,
             capture_output=True,
             text=True,
@@ -84,10 +81,10 @@ def crash_application(app_package: str):
         raise AndroidDeviceCommandError(error_message) from error
 
 
-def collapse_notification_shade():
+def collapse_notification_shade(udid: str):
     try:
         subprocess.run(
-            ["adb", "-s", DEVICE_UDID, "shell", "cmd", "statusbar", "collapse"],
+            ["adb", "-s", udid, "shell", "cmd", "statusbar", "collapse"],
                 check=True,
                 capture_output=True,
                 text=True,
@@ -104,10 +101,10 @@ def collapse_notification_shade():
         raise AndroidDeviceCommandError(error_message) from error
 
 
-def get_logcat(lines: int = 500) -> str:
+def get_logcat(udid: str, lines: int = 500) -> str:
     try:
         completed_process = subprocess.run(
-            ["adb", "-s", DEVICE_UDID, "logcat", "-d", "-t", str(lines)],
+            ["adb", "-s", udid, "logcat", "-d", "-t", str(lines)],
             check=True,
             capture_output=True,
             text=True,
@@ -126,8 +123,8 @@ def get_logcat(lines: int = 500) -> str:
     return completed_process.stdout
 
 
-def get_crash_logcat(app_package: str, lines: int = 1000) -> str:
-    logcat_lines = get_logcat(lines).splitlines()
+def get_crash_logcat(udid: str, app_package: str, lines: int = 1000) -> str:
+    logcat_lines = get_logcat(udid, lines).splitlines()
 
     for index in range(len(logcat_lines) - 1, -1, -1):
         if "FATAL EXCEPTION" not in logcat_lines[index]:

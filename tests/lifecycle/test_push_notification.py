@@ -19,10 +19,10 @@ from utils.android_device import (
 @allure.feature("Жизненный цикл приложения")
 @allure.story("Системное уведомление")
 @allure.title("Тестовое уведомление не приводит к крашу приложения")
-def test_push_notification_does_not_crash_product_card(driver):
+def test_push_notification_does_not_crash_product_card(driver, device_profile):
     # Выполняем предусловие: закрываем шторку уведомлений.
     with allure.step("Предусловие: закрыть шторку уведомлений"):
-        collapse_notification_shade()
+        collapse_notification_shade(device_profile.udid)
 
     # Выполняем предусловие: открываем карточку первого товара.
     with allure.step("Предусловие: открыть карточку первого товара"):
@@ -32,7 +32,11 @@ def test_push_notification_does_not_crash_product_card(driver):
 
     # Отправляем тестовое системное уведомление на эмулятор.
     with allure.step("Отправить тестовое системное уведомление"):
-        post_test_notification(SYSTEM_NOTIFICATION_TITLE, SYSTEM_NOTIFICATION_TEXT)
+        post_test_notification(
+            device_profile.udid,
+            SYSTEM_NOTIFICATION_TITLE,
+            SYSTEM_NOTIFICATION_TEXT,
+        )
 
     try:
         # Открываем шторку и проверяем полученное уведомление.
@@ -49,7 +53,7 @@ def test_push_notification_does_not_crash_product_card(driver):
         # Закрываем шторку, не скрывая результат основной проверки при сбое ADB.
         with allure.step("Закрыть шторку уведомлений после проверки"):
             try:
-                collapse_notification_shade()
+                collapse_notification_shade(device_profile.udid)
             except AndroidDeviceCommandError as error:
                 allure.attach(
                     str(error),
