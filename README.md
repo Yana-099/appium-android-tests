@@ -95,7 +95,7 @@ pip install -r requirements.txt
 Run one specific test file:
 
 ```bash
-pytest tests/login/test_authorization.py -v
+pytest tests/login/test_amt_1_valid_login.py -v
 ```
 
 Run tests with a marker:
