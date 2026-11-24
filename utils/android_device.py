@@ -1,7 +1,11 @@
 import os
+import re
 import shlex
 import subprocess
 from pathlib import Path
+
+
+MAX_FAILURE_LOGCAT_LINES = 80
 
 class AndroidDeviceCommandError(RuntimeError):
     pass
@@ -123,6 +127,24 @@ def get_logcat(udid: str, lines: int = 500) -> str:
     return completed_process.stdout
 
 
+def filter_failure_logcat(
+    logcat: str, app_package: str, max_lines: int = MAX_FAILURE_LOGCAT_LINES
+) -> str:
+    """Оставляет строки уровня E/F, относящиеся к тестируемому приложению."""
+    relevant_lines = [
+        line
+        for line in logcat.splitlines()
+        if app_package in line and re.search(r"(?:^|\s)[EF]\s+[^:\s]+:", line)
+    ]
+    if not relevant_lines:
+        return "В Android logcat не найдены релевантные ошибки приложения."
+    return "\n".join(relevant_lines[-max_lines:])
+
+
+def get_failure_logcat(udid: str, app_package: str, lines: int = 500) -> str:
+    return filter_failure_logcat(get_logcat(udid, lines), app_package)
+
+
 def get_crash_logcat(udid: str, app_package: str, lines: int = 1000) -> str:
     logcat_lines = get_logcat(udid, lines).splitlines()
 
@@ -141,5 +163,5 @@ def get_crash_logcat(udid: str, app_package: str, lines: int = 1000) -> str:
 
     return (
         f"В Android logcat не найден блок FATAL EXCEPTION для приложения {app_package}.\n"
-        "Полный logcat сохранён для обычных упавших тестов."
+        "Для обычных упавших тестов сохраняется только релевантный фрагмент logcat."
     )

@@ -14,7 +14,7 @@ from config.settings import APP_PACKAGE, APPIUM_SERVER_URL
 from config.test_data import STANDARD_PASSWORD, STANDARD_USERNAME
 from pages.login_page import LoginPage
 from pages.products_page import ProductsPage
-from utils.android_device import AndroidDeviceCommandError, get_crash_logcat, get_logcat
+from utils.android_device import AndroidDeviceCommandError, get_crash_logcat, get_failure_logcat
 from utils.allure_environment import write_allure_environment
 from utils.allure_results import remove_internal_fixture_steps
 from utils.screenshots import save_failure_screenshot
@@ -111,7 +111,7 @@ def pytest_runtest_makereport(item, call):
                     (
                         get_crash_logcat(device_profile.udid, APP_PACKAGE)
                         if is_crash_demo
-                        else get_logcat(device_profile.udid)
+                        else get_failure_logcat(device_profile.udid, APP_PACKAGE)
                     ),
                     name=(
                         "Android logcat: причина аварийного завершения"
