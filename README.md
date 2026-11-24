@@ -1,41 +1,41 @@
-# Appium Android UI Tests
+# Appium Android UI-тесты
 
 [![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![pytest](https://img.shields.io/badge/pytest-9.2.0-0A9EDC?logo=pytest&logoColor=white)](https://pytest.org/)
 [![Appium](https://img.shields.io/badge/Appium-6.1.7-EE376D?logo=appium&logoColor=white)](https://appium.io/)
-[![Android](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)](https://www.android.com/)
-[![Smoke tests](https://github.com/Yana-099/appium-android-tests/actions/workflows/android-self-hosted.yml/badge.svg?branch=main)](https://github.com/Yana-099/appium-android-tests/actions/workflows/android-self-hosted.yml)
-[![Allure Report](https://img.shields.io/badge/Allure_Report-GitHub_Pages-7B68EE?logo=allure&logoColor=white)](https://yana-099.github.io/appium-android-tests/)
+[![Android](https://img.shields.io/badge/Платформа-Android-3DDC84?logo=android&logoColor=white)](https://www.android.com/)
+[![Проверки](https://github.com/Yana-099/appium-android-tests/actions/workflows/android-self-hosted.yml/badge.svg?branch=main)](https://github.com/Yana-099/appium-android-tests/actions/workflows/android-self-hosted.yml)
+[![Отчёт Allure](https://img.shields.io/badge/Allure_Report-GitHub_Pages-7B68EE?logo=allure&logoColor=white)](https://yana-099.github.io/appium-android-tests/)
 
-Portfolio project with automated UI tests for the [Sauce Labs My Demo App](https://github.com/saucelabs/my-demo-app-android) Android application.
+Портфолио-проект с автоматизированными UI-тестами Android-приложения [Sauce Labs My Demo App](https://github.com/saucelabs/my-demo-app-android).
 
-The project demonstrates a maintainable mobile test automation framework built with Python, pytest, Appium, Page Object Model, and Allure reporting.
+Проект демонстрирует поддерживаемый фреймворк мобильной автоматизации на Python, pytest, Appium, Page Object Model и Allure.
 
-## Highlights
+## Ключевые возможности
 
-- Page Object Model structure with reusable page classes.
-- One test scenario per file, grouped by business area.
-- Allure steps, labels, screenshots, page source, and Android logcat attachments on failure.
-- Pillow-based visual regression test with baseline, actual, diff, and comparison metrics in Allure.
-- Centralized test data in `config/test_data.py`.
-- pytest markers: `smoke`, `regression`, `negative`, `visual`, and `crash_demo`.
-- A deliberately failing crash demonstration is isolated and runs only with `--run-crash-demo`.
+- Структура Page Object Model с переиспользуемыми классами страниц.
+- По одному тестовому сценарию в файле, группировка по бизнес-областям.
+- Шаги и метки Allure, а также screenshot, page source и Android logcat при падении.
+- Визуальная регрессия на Pillow с эталоном, фактическим изображением, diff и метриками сравнения в Allure.
+- Централизованные тестовые данные в `config/test_data.py`.
+- Маркеры pytest: `smoke`, `regression`, `negative`, `visual` и `crash_demo`.
+- Изолированная демонстрация падения из-за crash запускается только с флагом `--run-crash-demo`.
 
-## Portfolio scope
+## Границы портфолио-набора
 
-The mobile suite is intentionally curated rather than optimized for test count. Each retained scenario demonstrates either distinct business coverage or a separate automation capability, such as Android lifecycle handling, ADB interaction, visual comparison, failure diagnostics, or parameterized device profiles. Redundant checks and persistently unstable scenarios are kept out of the automated portfolio suite so its regular runs remain focused and trustworthy.
+Мобильный набор намеренно отобран по смыслу, а не по количеству тестов. Каждый оставленный сценарий демонстрирует либо отдельное бизнес-покрытие, либо самостоятельную возможность автоматизации: работу с Android lifecycle, ADB, визуальное сравнение, диагностику падений или параметризацию профилей устройств. Дублирующие проверки и постоянно нестабильные сценарии исключены из портфолио-набора, чтобы регулярные прогоны оставались сфокусированными и заслуживающими доверия.
 
-## Allure step design
+## Подход к шагам Allure
 
-The project uses a hybrid approach to Allure steps:
+В проекте используется гибридный подход к шагам Allure:
 
-- Reusable UI actions, such as opening a product, adding it to the cart, opening the cart, and proceeding through Checkout, are declared with `@allure.step` in Page Object methods.
-- Scenario-specific business checks, form validation, lifecycle actions, diagnostic attachments, and assertions remain explicit `with allure.step(...)` blocks in the test files.
-- Soft assertions are intentionally not used: the project uses regular `assert` statements so a critical scenario stops at the exact point of failure.
+- Повторно используемые UI-действия — открыть товар, добавить его в корзину, открыть корзину и перейти к Checkout — объявлены через `@allure.step` в методах Page Object.
+- Проверки, специфичные для сценария, валидация форм, действия жизненного цикла, диагностические вложения и `assert` остаются явными блоками `with allure.step(...)` в файлах тестов.
+- Soft assertions намеренно не используются: обычные `assert` останавливают критический сценарий ровно в точке падения.
 
-This keeps repeated implementation details in one place while preserving clear, business-readable steps in Allure reports.
+Так повторяющиеся технические детали хранятся в одном месте, а в Allure сохраняются понятные бизнес-шаги.
 
-## Tech stack
+## Технологический стек
 
 - Python 3
 - pytest
@@ -45,60 +45,61 @@ This keeps repeated implementation details in one place while preserving clear, 
 - Allure Report
 - Pillow
 
-## Project structure
+## Структура проекта
 
 ```text
-config/     # Appium configuration, capabilities, and test data
-pages/      # Page Object classes
-tests/      # Test scenarios grouped by feature
-utils/      # Android, Allure, and screenshot helpers
-artifacts/  # Local failure artifacts (not committed)
+config/     # Конфигурация Appium, capabilities и тестовые данные
+pages/      # Классы Page Object
+tests/      # Тестовые сценарии, сгруппированные по функциональности
+utils/      # Вспомогательные функции для Android, Allure и screenshot
+tools/      # CLI-утилиты, включая AI-анализ падений
+artifacts/  # Локальные артефакты падений (не коммитятся)
 ```
 
-## Prerequisites
+## Предварительные требования
 
-Before running the tests, make sure you have:
+Перед запуском тестов убедитесь, что установлены и настроены:
 
-1. Python 3 installed.
-2. An Android emulator or device available through ADB.
-3. Appium server installed and started.
-4. The Sauce Labs My Demo App installed on the target device.
-5. Allure CLI installed if you want to open Allure reports.
+1. Python 3.
+2. Android-эмулятор или устройство, доступное через ADB.
+3. Запущенный сервер Appium.
+4. Sauce Labs My Demo App на целевом устройстве.
+5. Allure CLI, если требуется открыть Allure-отчёт.
 
-The shared Appium configuration is stored in `config/settings.py`, while named devices are defined in `config/device_profiles.py`:
+Общая конфигурация Appium находится в `config/settings.py`, именованные устройства — в `config/device_profiles.py`:
 
-- default profile: `pixel_api31` (`emulator-5554`)
-- additional profile: `small_phone_api34` (`emulator-5556`)
-- Appium server: `http://127.0.0.1:4723`
-- application id: `com.saucelabs.mydemoapp.android`
+- профиль по умолчанию: `pixel_api31` (`emulator-5554`);
+- дополнительный профиль: `small_phone_api34` (`emulator-5556`);
+- сервер Appium: `http://127.0.0.1:4723`;
+- application id: `com.saucelabs.mydemoapp.android`.
 
-## Installation
+## Установка
 
 ```bash
 python -m venv .venv
 ```
 
-Activate the virtual environment:
+Активируйте виртуальное окружение:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
 
-Install project dependencies:
+Установите зависимости проекта:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## Running tests
+## Запуск тестов
 
-Run one specific test file:
+Запуск одного файла с тестом:
 
 ```bash
 pytest tests/login/test_valid_login.py -v
 ```
 
-Run tests with a marker:
+Запуск тестов по маркеру:
 
 ```bash
 pytest -m smoke -v
@@ -107,72 +108,131 @@ pytest -m negative -v
 pytest -m visual -v
 ```
 
-Select a device profile when pytest starts:
+Выбор профиля устройства при запуске pytest:
 
 ```powershell
 pytest -m smoke --device pixel_api31
 pytest -m smoke --device small_phone_api34
 ```
 
-When `--device` is omitted, pytest uses `pixel_api31` to preserve the existing local workflow. The Small Phone profile expects its emulator to be available as `emulator-5556`.
+Если `--device` не указан, pytest использует `pixel_api31`, сохраняя привычный локальный процесс запуска. Для профиля Small Phone требуется доступный эмулятор `emulator-5556`.
 
-The crash diagnostic demonstration is intentionally failing and skipped by default. Run it explicitly only when needed:
+Демонстрация crash намеренно завершается падением и по умолчанию пропускается. Запускайте её только при необходимости:
 
 ```bash
 pytest tests/lifecycle/test_crash_demo.py --run-crash-demo -v
 ```
 
-## Visual regression test
+## Тест визуальной регрессии
 
-The product card visual test complements functional assertions by checking the rendered layout of the product image, title, price, rating, color selector, quantity controls, and Add to cart button. The captured region excludes Android system bars and the transient right-edge scrollbar.
+Визуальный тест карточки товара дополняет функциональные проверки: он контролирует отображение изображения товара, названия, цены, рейтинга, выбора цвета, управления количеством и кнопки `Add to cart`. Область скриншота не включает системные панели Android и временную полосу прокрутки у правого края.
 
-Run the visual test separately:
+Запустите визуальный тест отдельно:
 
 ```bash
 pytest -m visual -v
 ```
 
-The committed baseline supports one fixed environment profile:
+Закоммиченный эталон поддерживает один фиксированный профиль окружения:
 
-- device: `emulator-5554`
-- resolution: `1080x2400`
-- orientation: portrait
-- baseline: `tests/visual/baselines/android-emulator-5554/product_card.png`
+- устройство: `emulator-5554`;
+- разрешение: `1080x2400`;
+- ориентация: портретная;
+- эталон: `tests/visual/baselines/android-emulator-5554/product_card.png`.
 
-Pillow compares the baseline and actual RGB images without resizing them. A pixel is treated as changed when at least one color channel differs by more than `8`; the test fails when changed pixels occupy more than `0.1%` of the captured region. These thresholds were calibrated on repeated runs of the fixed emulator profile and should be recalibrated before adding another device or Android configuration.
+Pillow сравнивает RGB-изображения эталона и фактического результата без изменения размера. Пиксель считается изменённым, если хотя бы один цветовой канал отличается более чем на `8`; тест падает, если изменённые пиксели занимают более `0.1%` захваченной области. Пороги откалиброваны на повторных запусках фиксированного профиля эмулятора; перед добавлением другого устройства или конфигурации Android их необходимо откалибровать заново.
 
-Every comparison adds the following attachments to Allure:
+Каждое сравнение добавляет в Allure следующие вложения:
 
-- `Визуальный эталон` — committed baseline image;
-- `Фактический результат` — screenshot captured during the current run;
-- `Визуальная разница` — grayscale actual image with changed pixels highlighted in red;
-- `Метрики визуального сравнения` — JSON with changed-pixel counts, ratio, thresholds, and pass status.
+- `Визуальный эталон` — закоммиченное эталонное изображение;
+- `Фактический результат` — скриншот текущего прогона;
+- `Визуальная разница` — фактическое изображение в градациях серого с изменёнными пикселями, выделенными красным;
+- `Метрики визуального сравнения` — JSON с количеством изменённых пикселей, их долей, порогами и статусом проверки.
 
-If image dimensions differ, the test does not resize them. Allure receives both input images, a side-by-side diagnostic image, and structured error details. Baselines are never updated automatically during a normal test run.
+Если размеры изображений различаются, тест не изменяет их размер. В Allure прикладываются оба исходных изображения, диагностическое изображение с результатами рядом и структурированные сведения об ошибке. Эталоны никогда не обновляются автоматически при обычном запуске тестов.
 
-## Allure reports
+## Отчёты Allure
 
-Pytest writes raw results to `allure-results/`. To open a report after a test run:
+Pytest записывает сырые результаты в `allure-results/`. Чтобы открыть отчёт после прогона:
 
 ```bash
 allure serve allure-results
 ```
 
-## Test data and safety
+## AI-анализ одного падения (демо)
 
-Credentials and payment values in `config/test_data.py` are public demo data for the test application; they are not personal or production credentials. Do not add real secrets, tokens, or personal data to the repository.
+Этот проект показывает, как AI-агент может разобрать уже собранные артефакты одного упавшего мобильного теста. Демонстрационный сценарий — негативная проверка неверного пароля: в зафиксированном падении screenshot и XML показывают экран Products, хотя проверка ожидала Login.
 
-## Device profiles and multi-device execution
+### Схема работы
 
-Each pytest process runs on one selected Android device profile. The available profiles are:
+```text
+pytest
+  → screenshot + page source + logcat в allure-results
+  → tools/analyze_failure.py: сжатие XML и маскирование секретов
+  → OpenAI Responses API (только при наличии OPENAI_API_KEY)
+  → Markdown-вложение AI failure analysis у того же теста в Allure
+```
 
-- `pixel_api31` — the current Pixel 6 emulator and default profile;
-- `small_phone_api34` — a lightweight Small Phone emulator with Android 14 / API 34, Google APIs x86_64, 2 CPU cores, and 2 GB RAM.
+Если `OPENAI_API_KEY` не задан, API-вызов не выполняется: в Allure добавляется вложение с объяснением, а исходный статус pytest-теста остаётся без изменений.
 
-Each profile provides its own UDID, Android version, UiAutomator2 system port, visual-baseline directory, and Allure results directory. The default profile keeps `allure-results/`; the Small Phone profile writes to `allure-results-small_phone_api34/`.
+Скрипт анализирует уже существующий `failed`/`broken` Allure result. Для выбранного сценария он появляется, если актуальная версия демо-приложения действительно принимает неверный пароль:
 
-Several profiles can be tested sequentially by running pytest once per profile. Parallel execution is technically possible with the separate UDIDs, system ports, and result directories, but it is intentionally not implemented to keep this portfolio project simple. A later GitHub Actions update may add a device selector and an `all` option that runs these commands sequentially.
+```powershell
+pytest tests/login/test_invalid_authorization.py -v
+```
 
-## Notes
+Если тест пройдёт, скрипт честно сообщит, что упавший result не найден: он не создаёт искусственные сбои ради демонстрации.
 
-This repository is intended as a QA automation portfolio project. Local environments, generated reports, screenshots, logs, and bundled tools are excluded from Git.
+Затем передайте ключ только через переменную окружения и запустите постобработку:
+
+```powershell
+$env:OPENAI_API_KEY = "<your-key>"
+python tools/analyze_failure.py --results allure-results
+```
+
+Скрипт берёт последний `failed`/`broken` result, сокращает XML и logcat, маскирует очевидные значения `token`/`password` и отправляет контекст в OpenAI Responses API. Ответ имеет три коротких поля: причина (`root_cause`), доказательства (`evidence`) и практическое исправление (`suggested_fix`). Результат выводится в консоль, сохраняется в `artifacts/ai-report.md` и добавляется к этому же тесту в Allure как Markdown-вложение **AI failure analysis**. После запуска скрипта откройте или обновите Allure-отчёт — вложение будет рядом со screenshot, page source и logcat.
+
+Пример ожидаемого структурированного ответа:
+
+```json
+{
+  "root_cause": "Тест ожидает экран Login, но приложение осталось на Products.",
+  "evidence": "В XML нет элемента Login; screenshot показывает заголовок Products.",
+  "suggested_fix": "Перед проверкой изолировать состояние приложения или явно перейти на LoginPage."
+}
+```
+
+Для наглядности screenshot отправляется по умолчанию. Используйте публичное демо-приложение; если в изображении могут быть реальные данные, отключите его:
+
+```powershell
+python tools/analyze_failure.py --results allure-results --no-screenshot
+```
+
+Без `OPENAI_API_KEY`, при сетевой ошибке или ошибке API скрипт создаёт понятный отчёт и завершается успешно. В Allure в таком случае прикладывается то же понятное сообщение, а pytest-результат не меняется. `AI_FAILURE_MODEL` при необходимости переопределяет модель; по умолчанию используется `gpt-4o-mini`.
+
+### Отказоустойчивость (Graceful Degradation) и безопасность
+
+- `password`, `token`, `api_key`, `authorization` и Bearer-токены маскируются в текстовом контексте до отправки в API.
+- Запрос использует `store: false`; ключ читается только из переменной окружения `OPENAI_API_KEY` и не хранится в репозитории.
+- Если ключ не настроен или API недоступен, скрипт не меняет статус pytest-теста и не завершает сборку ошибкой: он добавляет в Allure понятное сообщение о том, почему AI-анализ не выполнен.
+
+Это сознательно компактный MVP: проект не добавляет CI-анализ, массовую обработку падений, дедупликацию или автоматическое редактирование Page Object/локаторов. AI-рекомендация всегда требует ревью человеком.
+
+## Тестовые данные и безопасность
+
+Учётные данные и платёжные значения в `config/test_data.py` — публичные демонстрационные данные тестового приложения, а не персональные или боевые данные. Не добавляйте в репозиторий реальные секреты, токены или персональные данные.
+
+## Профили устройств и запуск на нескольких устройствах
+
+Каждый процесс pytest запускается с одним выбранным профилем Android-устройства. Доступны следующие профили:
+
+- `pixel_api31` — текущий эмулятор Pixel 6 и профиль по умолчанию;
+- `small_phone_api34` — облегчённый эмулятор Small Phone с Android 14 / API 34, Google APIs x86_64, 2 CPU и 2 ГБ RAM.
+
+Каждый профиль задаёт собственные UDID, версию Android, системный порт UiAutomator2, каталог визуальных эталонов и каталог результатов Allure. Профиль по умолчанию использует `allure-results/`; Small Phone записывает в `allure-results-small_phone_api34/`.
+
+Несколько профилей можно протестировать последовательно, запуская pytest для каждого из них. Параллельный запуск технически возможен благодаря отдельным UDID, системным портам и каталогам результатов, но намеренно не реализован, чтобы портфолио-проект оставался простым. В дальнейшем GitHub Actions может получить выбор устройства и опцию `all`, запускающую эти команды последовательно.
+
+## Примечания
+
+Этот репозиторий предназначен для QA-портфолио по автоматизации. Локальные окружения, сгенерированные отчёты, скриншоты, логи и поставляемые с проектом инструменты исключены из Git.
