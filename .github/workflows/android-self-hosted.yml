@@ -12,7 +12,6 @@ on:
           - smoke
           - regression
           - negative
-          - known_bug
 
 concurrency:
   group: android-emulator-5554

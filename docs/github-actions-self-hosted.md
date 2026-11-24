@@ -22,7 +22,7 @@ Workflow `.github/workflows/android-self-hosted.yml` запускается вр
 1. Откройте вкладку **Actions** в репозитории.
 2. Выберите workflow **Android UI tests (self-hosted)**.
 3. Нажмите **Run workflow**.
-4. Выберите группу тестов: `smoke`, `regression`, `negative` или `known_bug`.
+4. Выберите группу тестов: `smoke`, `regression` или `negative`.
 5. После завершения скачайте артефакт `allure-and-artifacts-<номер запуска>` с Allure-результатами и скриншотами.
 
 `crash_demo` намеренно завершается с ошибкой и не включён в workflow. Его запускают только локально с флагом `--run-crash-demo`.
