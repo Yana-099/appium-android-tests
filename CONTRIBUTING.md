@@ -56,7 +56,7 @@ appium --address 127.0.0.1 --port 4723
 Запуск одного тестового файла:
 
 ```powershell
-python -m pytest tests/login/test_amt_1_valid_login.py -v
+python -m pytest tests/login/test_valid_login.py -v
 ```
 
 Запуск smoke-набора:
