@@ -127,6 +127,7 @@ python -m pytest -m smoke --device small_phone_api34 -v
 
 - Не изменяйте `main` напрямую. Для каждой задачи используйте отдельную ветку с коротким осмысленным именем и готовьте Pull Request в `main`.
 - До коммита просмотрите `git diff`, выполните `git diff --check` и убедитесь, что не добавлены секреты, отчёты, логи, screenshots, page source или другие generated artifacts.
+- **Documentation-only changes:** Check `git diff --check`, verify that all referenced file paths and CLI commands exist, and do not start Appium or an Android emulator.
 - Не используйте `git add .` или `git add -A`: добавляйте в индекс только явно перечисленные ожидаемые файлы. Никогда не индексируйте `allure-results*/`, `allure-report/`, `artifacts/`, `.pytest_cache/`, `.venv/`, `.env*` или `*.log`.
 - Для изменения unit/helper-кода запускайте затронутые unit-тесты и `python -m pytest --collect-only -q`.
 - Для изменения Page Object, фикстур, UI-тестов, профилей или visual comparison дополнительно запустите затронутый набор на явно выбранном доступном профиле (`pixel_api31` или `small_phone_api34`) с доступными Appium и эмулятором. Если окружение недоступно, не заявляйте, что UI-набор прошёл: зафиксируйте точную невыполненную проверку в PR.
