@@ -52,8 +52,9 @@
 config/     # Конфигурация Appium, capabilities и тестовые данные
 pages/      # Классы Page Object
 tests/      # Тестовые сценарии, сгруппированные по функциональности
+tests/visual/baselines/  # Защищённые эталонные скриншоты
 utils/      # Вспомогательные функции для Android, Allure и screenshot
-tools/      # CLI-утилиты: AI-анализ падений, генератор тестов из Qase и multi-device demo
+tools/      # CLI-утилиты: AI-анализ падений, генератор тестов из Qase, Telegram-отчёты и multi-device demo
 artifacts/  # Локальные артефакты падений (не коммитятся)
 ```
 
