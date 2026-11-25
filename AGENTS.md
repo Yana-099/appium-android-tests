@@ -24,6 +24,7 @@
 
 - `pages/` — Page Object: локаторы, ожидания и повторно используемые UI-действия.
 - `tests/` — сценарии, предусловия, проверки, Allure-метаданные и бизнес-шаги.
+- `tests/visual/baselines/` — защищённые эталонные скриншоты для визуального сравнения.
 - `config/` — профили устройств, capabilities, настройки и разрешённые demo-данные.
 - `conftest.py` — pytest-фикстуры, Appium-сессия, хуки и диагностика падений.
 - `utils/` — изолированные помощники для Android, Allure, скриншотов и визуального сравнения.
@@ -34,7 +35,7 @@
 
 ```powershell
 python -m pytest --collect-only -q
-python -m pytest tests/unit tests/tools -q
+python -m pytest tests/unit -q
 python -m pytest tests/products/test_product_card.py --device pixel_api31 -v
 python -m pytest -m smoke --device small_phone_api34 -v
 ```
