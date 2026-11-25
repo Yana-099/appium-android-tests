@@ -225,6 +225,8 @@ $env:OPENAI_API_KEY = "<your-key>"
 python tools/analyze_failure.py --results allure-results
 ```
 
+Если тесты запускались с `--device small_phone_api34`, укажите каталог этого профиля: `--results allure-results-small_phone_api34`.
+
 Скрипт берёт последний `failed`/`broken` result, сокращает XML и logcat, маскирует очевидные значения `token`/`password` и отправляет контекст в OpenAI Responses API. Ответ имеет три коротких поля: причина (`root_cause`), доказательства (`evidence`) и практическое исправление (`suggested_fix`). Результат выводится в консоль, сохраняется в `artifacts/ai-report.md` и добавляется к этому же тесту в Allure как Markdown-вложение **AI failure analysis**. После запуска скрипта откройте или обновите Allure-отчёт — вложение будет рядом со screenshot, page source и logcat.
 
 Пример ожидаемого структурированного ответа:
