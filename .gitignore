@@ -10,9 +10,3 @@ allure-results*/
 allure-report/
 artifacts/
 *.log
-tools/
-!tools/
-tools/*
-!tools/send_telegram_report.py
-!tools/analyze_failure.py
-!tools/run_multi_device_demo.ps1
