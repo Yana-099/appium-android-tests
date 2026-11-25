@@ -53,6 +53,17 @@ appium --address 127.0.0.1 --port 4723
 
 ## 4. Запуск тестов
 
+Быстрые проверки без эмулятора:
+
+```powershell
+python -m pytest --collect-only -q
+python -m pytest tests/unit -q
+```
+
+Для UI-тестов выберите профиль через `--device`: `pixel_api31` или `small_phone_api34`. Для запуска на обоих профилях используйте `.\tools\run_multi_device_demo.ps1`.
+
+Визуальные эталоны в `tests/visual/baselines/` автоматически не обновляются.
+
 Запуск одного тестового файла:
 
 ```powershell
@@ -87,6 +98,8 @@ python -m pytest tests/lifecycle/test_crash_demo.py --run-crash-demo -v
 allure serve allure-results
 ```
 
+Для профиля `small_phone_api34` используйте каталог `allure-results-small_phone_api34`. Каталог результатов выбранного профиля очищается перед каждым новым запуском pytest, поэтому откройте отчёт до следующего прогона этого профиля.
+
 Последний отчёт из успешного GitHub Actions запуска доступен в GitHub Pages:
 
 https://yana-099.github.io/appium-android-tests/
@@ -113,6 +126,7 @@ git switch -c feature/short-task-name
 После изменений проверьте нужный тест или маркер, затем отправьте ветку:
 
 ```powershell
+git diff --check
 git add <файлы>
 git commit -m "test: short description"
 git push -u origin feature/short-task-name
