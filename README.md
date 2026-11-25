@@ -43,6 +43,7 @@
 - UiAutomator2
 - Android Emulator
 - Allure Report
+- Qase TMS API
 - Pillow
 
 ## Структура проекта
@@ -52,7 +53,7 @@ config/     # Конфигурация Appium, capabilities и тестовые 
 pages/      # Классы Page Object
 tests/      # Тестовые сценарии, сгруппированные по функциональности
 utils/      # Вспомогательные функции для Android, Allure и screenshot
-tools/      # CLI-утилиты, включая AI-анализ падений
+tools/      # CLI-утилиты: AI-анализ падений, генератор тестов из Qase и multi-device demo
 artifacts/  # Локальные артефакты падений (не коммитятся)
 ```
 
@@ -251,16 +252,53 @@ python tools/analyze_failure.py --results allure-results --no-screenshot
 
 Это сознательно компактный MVP: проект не добавляет CI-анализ, массовую обработку падений, дедупликацию или автоматическое редактирование Page Object/локаторов. AI-рекомендация всегда требует ревью человеком.
 
-## Черновик автотеста из Qase
+## От кейса Qase к автотесту: AMT-3
 
-Пометьте кейс проекта `AMT` как **To be automated** и задайте `QASE_API_TOKEN` и `OPENAI_API_KEY` в окружении.
+CLI-инструмент `tools/generate_from_qase.py` загружает один ручной сценарий из Qase TMS и формирует черновик pytest-теста по правилам репозитория.
 
-```powershell
-python tools/generate_from_qase.py
-python tools/generate_from_qase.py --case-id 15
+### Схема работы
+
+```text
+Qase TMS (To be automated или --case-id)
+  → tools/generate_from_qase.py: кейс, сигнатуры Page Object и пример теста
+  → OpenAI Responses API или черновик из Codex через --mock-response
+  → AST-валидация → artifacts/qase-generated/
+  → ревью человеком → tests/products/test_amt_3_empty_cart.py
 ```
 
-Первая команда выбирает один кейс из очереди, вторая загружает кейс по ID. Используйте публичные демо-данные, поскольку шаги кейса и контекст проекта передаются в OpenAI. CLI сохраняет черновик в `artifacts/qase-generated/` или сообщает о недостающих методах. Проверьте результат перед переносом в `tests/`. Статус кейса обновляется отдельно после успешного прогона.
+Запуск генератора с обращением к API. Используйте публичные демо-данные, поскольку шаги кейса и контекст теста передаются в OpenAI.
+
+```powershell
+$env:QASE_API_TOKEN = "<your-qase-token>"
+$env:OPENAI_API_KEY = "<your-openai-key>"
+python tools/generate_from_qase.py --project AMT --case-id 3
+```
+
+Если модель сообщает, что для сценария не хватает методов или локаторов Page Object, CLI выводит список пробелов и завершает работу с кодом `2`.
+
+Для AMT-3 черновик подготовлен в Codex, проверен через CLI с `--mock-response` и после ревью добавлен в [тест формы пустой корзины](tests/products/test_amt_3_empty_cart.py) с привязкой `@qase.id(3)`.
+
+Тест проверяет верхнюю панель, заголовок `No Items`, наличие иллюстрации, сообщение и надпись `Go Shopping`. Цвет кнопки и внешний вид логотипа в автоматическую проверку не входят.
+
+```powershell
+python -m pytest tests/products/test_amt_3_empty_cart.py --device pixel_api31 -v
+```
+
+### Артефакты выполнения
+
+Карточка AMT-3 в Qase:
+
+![Карточка кейса AMT-3 в Qase](docs/images/qase-case-amt-3.png)
+
+Результат **Passed**, привязанный к AMT-3 в Qase TestOps:
+
+![Результат прогона AMT-3 в Qase](docs/images/qase-run-amt-3.png)
+
+### Отказоустойчивость и ограничения
+
+- Токены читаются из переменных окружения. Запросы к модели используют `store: false`.
+- AST-валидатор проверяет синтаксис, привязку `@qase.id(...)`, маркер `@pytest.mark.ai_generated` и запрещённые вызовы перед сохранением черновика.
+- Генератор обрабатывает один кейс. Изменения Page Object и публикация в Git выполняются отдельно после ревью.
 
 ## Тестовые данные и безопасность
 
