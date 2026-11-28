@@ -27,7 +27,7 @@ jobs:
       - name: Скачать Allure-результаты текущего запуска
         id: download_allure
         continue-on-error: true
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: allure-and-artifacts-${{ github.event.workflow_run.run_number }}
           path: downloaded-artifact
